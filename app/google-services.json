@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "789837884390",
+    "project_id": "weatherbuddy-499cc",
+    "storage_bucket": "weatherbuddy-499cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:789837884390:android:67bde0b100273b329b8427",
+        "android_client_info": {
+          "package_name": "com.antonyhayek.weatherbuddy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "789837884390-6ievknfvh4a1b3as73bdm1muak7uppqi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArP6gBgblFKcP5P92FTXbso2_Z4YDB9h0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "789837884390-6ievknfvh4a1b3as73bdm1muak7uppqi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

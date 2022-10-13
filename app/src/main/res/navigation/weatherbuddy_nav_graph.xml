@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/weatherbuddy_nav_graph.xml"
+    app:startDestination="@id/dashboardFragment">
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.antonyhayek.weatherbuddy.presentation.ui.dashboard.DashboardFragment"
+        android:label="DashboardFragment"
+        tools:layout="@layout/fragment_dashboard">
+        <action
+            android:id="@+id/action_dashboardFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+       <!-- <action
+            android:id="@+id/action_dashboardFragment_to_weatherDetailsFragment"
+            app:destination="@id/weatherDetailsFragment" />-->
+        <action
+            android:id="@+id/action_dashboardFragment_to_favoritesFragment"
+            app:destination="@id/favoritesFragment" />
+        <action
+            android:id="@+id/action_dashboardFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.antonyhayek.weatherbuddy.presentation.ui.settings.SettingsFragment"
+        android:label="SettingsFragment"
+        tools:layout="@layout/fragment_settings">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/weatherDetailsFragment"
+        android:name="com.antonyhayek.weatherbuddy.presentation.ui.cityweatherdetails.WeatherDetailsFragment"
+        android:label="WeatherDetailsFragment"
+        tools:layout="@layout/fragment_weather_details">
+
+        <argument
+            android:name="lat"
+            app:argType="float" />
+
+        <argument
+            android:name="lon"
+            app:argType="float" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.antonyhayek.weatherbuddy.presentation.ui.favorites.FavoritesFragment"
+        android:label="FavoritesFragment"
+        tools:layout="@layout/fragment_favorites">
+        <action
+            android:id="@+id/action_favoritesFragment_to_weatherDetailsFragment"
+            app:destination="@id/weatherDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.antonyhayek.weatherbuddy.presentation.ui.citysearch.SearchFragment"
+        android:label="SearchFragment"
+        tools:layout="@layout/fragment_search"
+        >
+        <action
+            android:id="@+id/action_searchFragment_to_weatherDetailsFragment"
+            app:destination="@id/weatherDetailsFragment" />
+    </fragment>
+</navigation>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="currentWeather"
+            type="com.antonyhayek.weatherbuddy.data.remote.LocationWeather" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".presentation.ui.cityweatherdetails.WeatherDetailsFragment">
+
+        <ImageView
+            android:id="@+id/iv_location"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="20dp"
+            android:src="@drawable/ic_location_on_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_location_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:maxLines="2"
+            android:text="@{currentWeather.name}"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_location"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_location"
+            app:layout_constraintTop_toTopOf="@+id/iv_location"
+            tools:hint="Location Name" />
+
+        <ImageView
+            android:id="@+id/iv_weather_icon"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/ic_launcher_foreground"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_location_name" />
+
+        <TextView
+            android:id="@+id/tv_weather_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:paddingHorizontal="10dp"
+            android:text="@{currentWeather.weather.get(0).description}"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_weather_icon"
+            tools:text="Light Rain" />
+
+        <TextView
+            android:id="@+id/tv_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@{Double.toString(currentWeather.main.temp)}"
+            android:textSize="60sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_weather_description"
+            tools:text="23" />
+
+        <TextView
+            android:id="@+id/tv_degree_symbol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="°"
+            android:textSize="30sp"
+            app:layout_constraintStart_toEndOf="@id/tv_temperature"
+            app:layout_constraintTop_toTopOf="@+id/tv_temperature" />
+
+        <TextView
+            android:id="@+id/tv_wind_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:drawablePadding="5dp"
+            android:gravity="center_vertical"
+            android:text="@{currentWeather.wind.speed + ` km/h`}"
+            android:textColor="@color/black"
+            app:drawableStartCompat="@drawable/ic_wind_24"
+            app:layout_constraintEnd_toStartOf="@+id/tv_humidity"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_temperature"
+            tools:text="10 km/h" />
+
+        <TextView
+            android:id="@+id/tv_humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:drawablePadding="5dp"
+            android:gravity="center_vertical"
+            android:text="@{currentWeather.main.humidity + ` %`}"
+            android:textColor="@color/black"
+            app:drawableStartCompat="@drawable/ic_humidity_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_wind_speed"
+            app:layout_constraintTop_toBottomOf="@+id/tv_temperature"
+            tools:text="47 %" />
+
+        <View
+            android:id="@+id/view_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="20dp"
+            android:alpha="0.5"
+            android:background="@color/teal_700"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_wind_speed" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_next_days"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            android:splitMotionEvents="false"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view_separator" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
