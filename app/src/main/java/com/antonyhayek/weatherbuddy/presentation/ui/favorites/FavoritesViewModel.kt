@@ -16,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
     private val retrieveFavoriteCitiesUseCase: RetrieveFavoriteCitiesUseCase,
-    private val deleteFavoriteCityUseCase: DeleteFavoriteCityUseCase
+    private val deleteFavoriteCityUseCase: DeleteFavoriteCityUseCase,
+    private val insertFavoriteCityListFromCSVUseCase: InsertFavoriteCityListFromCSVUseCase
 ) : ViewModel() {
     private val _favoritesState = MutableStateFlow<UIEventFavorites>(
         UIEventFavorites.OnLoading(false)
@@ -42,6 +43,12 @@ class FavoritesViewModel @Inject constructor(
         viewModelScope.launch {
             deleteFavoriteCityUseCase(id)
             retrieveFavoriteCities()
+        }
+    }
+
+    fun importCitiesFromCSV(columns: StringBuilder, value: StringBuilder) {
+        viewModelScope.launch {
+            insertFavoriteCityListFromCSVUseCase(columns, value)
         }
     }
 

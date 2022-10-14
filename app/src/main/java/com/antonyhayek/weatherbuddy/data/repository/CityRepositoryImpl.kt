@@ -1,6 +1,7 @@
 package com.antonyhayek.weatherbuddy.data.repository
 
 import android.content.Context
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.antonyhayek.weatherbuddy.data.local.Cities
 import com.antonyhayek.weatherbuddy.data.local.City
 import com.antonyhayek.weatherbuddy.data.local.FavoriteCity
@@ -60,6 +61,13 @@ class CityRepositoryImpl @Inject constructor(
 
     override suspend fun getFavCityById(id: Long): Flow<FavoriteCity> {
         return favoriteDao.getFavCityById(id)
+    }
+
+    override suspend fun saveFavCitiesFromCSV(columns: StringBuilder, value: StringBuilder) {
+        val query = SimpleSQLiteQuery(
+            "Insert INTO Cities (" + columns.toString() + ") " + "values(" + value.toString() + ")"
+        )
+        cityDao.insertDataRawFormat(query)
     }
 
 }

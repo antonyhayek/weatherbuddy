@@ -20,4 +20,6 @@ interface CityRepository {
     suspend fun deleteFavCityById(id: Long)
 
     suspend fun getFavCityById(id: Long) : Flow<FavoriteCity>
+
+    suspend fun saveFavCitiesFromCSV(columns: StringBuilder, value: StringBuilder)
 }

@@ -12,10 +12,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@AndroidEntryPoint
-class WeatherNotificationService @Inject constructor(
-    private var apiService: ApiService
-) : Service() {
+class WeatherNotificationService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 

@@ -92,9 +92,13 @@ dependencies {
     kapt "androidx.hilt:hilt-compiler:$hiltCompiler"
 
     //room
-    def room_version = "2.4.2"
+    def room_version = "2.4.3"
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
+
+    //csv reader
+    implementation 'com.opencsv:opencsv:4.6'
+
 
     //jetpack navigation
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
