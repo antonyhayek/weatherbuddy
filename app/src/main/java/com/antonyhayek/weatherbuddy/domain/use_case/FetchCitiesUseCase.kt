@@ -1,6 +1,7 @@
 package com.antonyhayek.weatherbuddy.domain.use_case
 
 import com.antonyhayek.weatherbuddy.data.local.Cities
+import com.antonyhayek.weatherbuddy.data.local.City
 import com.antonyhayek.weatherbuddy.data.networking.Resource
 import com.antonyhayek.weatherbuddy.domain.repository.CityRepository
 import kotlinx.coroutines.flow.Flow
@@ -11,7 +12,6 @@ class FetchCitiesUseCase @Inject constructor(
     private val cityRepository: CityRepository
 ) {
 
-    operator fun invoke() : Flow<Resource<Cities>> = flow {
-        emit(cityRepository.getCities())
-    }
+    suspend operator fun invoke() : Flow<List<City>> = cityRepository.getCities()
+
 }

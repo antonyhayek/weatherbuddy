@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antonyhayek.weatherbuddy.data.networking.Resource
 import com.antonyhayek.weatherbuddy.data.remote.Coord
+import com.antonyhayek.weatherbuddy.data.remote.ForecastWeather
 import com.antonyhayek.weatherbuddy.data.remote.LocationWeather
+import com.antonyhayek.weatherbuddy.domain.use_case.GetCurrentForecastUseCase
 import com.antonyhayek.weatherbuddy.domain.use_case.GetCurrentWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,12 +16,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
-    private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase
+    private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
+    private val getCurrentForecastUseCase: GetCurrentForecastUseCase
 ) : ViewModel() {
-    private val _dashboardState = MutableStateFlow<UIEventDashboard>(
-        UIEventDashboard.OnLoading(false)
+    private val _currentWeatherState = MutableStateFlow<UIEventCurrentWeather>(
+        UIEventCurrentWeather.OnLoading(false)
     )
-    var dashboardState = _dashboardState.asStateFlow()
+
+    private val _forecastState = MutableStateFlow<UIEventForecast>(
+        UIEventForecast.OnLoading(false)
+    )
+
+    var currentWeatherState = _currentWeatherState.asStateFlow()
+    var forecastState = _forecastState.asStateFlow()
 
     private val _currentUserCoordFlow = MutableStateFlow(Coord(0.0,0.0))
     private val _temperatureFlow = MutableStateFlow(0.0)
@@ -27,21 +36,45 @@ class DashboardViewModel @Inject constructor(
 
 
     fun getCurrentWeather() {
-        _dashboardState.value = UIEventDashboard.OnLoading(true)
+        _currentWeatherState.value = UIEventCurrentWeather.OnLoading(true)
         viewModelScope.launch {
             getCurrentWeatherUseCase(
                 _currentUserCoordFlow.value
             ).collect{
                 when(it) {
                     is Resource.Failure -> {
-                        _dashboardState.value = UIEventDashboard.OnLoading(false)
-                        _dashboardState.value = UIEventDashboard.ShowErrorDialog(it)
+                        _currentWeatherState.value = UIEventCurrentWeather.OnLoading(false)
+                        _currentWeatherState.value = UIEventCurrentWeather.ShowErrorDialog(it)
                     }
-                    is Resource.Loading ->  UIEventDashboard.OnLoading(false)
+                    is Resource.Loading ->  UIEventCurrentWeather.OnLoading(false)
                     is Resource.Success -> {
-                        _dashboardState.value = UIEventDashboard.OnLoading(false)
-                        _dashboardState.value = UIEventDashboard.OnCurrentWeatherRetrieved(weather = it.value)
+                        _currentWeatherState.value = UIEventCurrentWeather.OnLoading(false)
+                        _currentWeatherState.value = UIEventCurrentWeather.OnCurrentWeatherRetrieved(weather = it.value)
 
+
+                    }
+                }
+            }
+        }
+    }
+
+
+    fun getCurrentForecast() {
+
+        _forecastState.value = UIEventForecast.OnLoading(true)
+        viewModelScope.launch {
+            getCurrentForecastUseCase(
+                _currentUserCoordFlow.value
+            ).collect{
+                when(it) {
+                    is Resource.Failure -> {
+                        _forecastState.value = UIEventForecast.OnLoading(false)
+                        _forecastState.value = UIEventForecast.ShowErrorDialog(it)
+                    }
+                    is Resource.Loading ->  UIEventForecast.OnLoading(false)
+                    is Resource.Success -> {
+                        _forecastState.value = UIEventForecast.OnLoading(false)
+                        _forecastState.value = UIEventForecast.OnCurrentForecastRetrieved(forecast = it.value)
 
                     }
                 }
@@ -53,10 +86,17 @@ class DashboardViewModel @Inject constructor(
         _currentUserCoordFlow.value = coord
     }
 
-    sealed class UIEventDashboard {
-        class OnLoading(var onLoading: Boolean) : UIEventDashboard()
-        class OnCurrentWeatherRetrieved(var weather : LocationWeather) : UIEventDashboard()
-        data class ShowErrorDialog(val resourceFailure: Resource.Failure) : UIEventDashboard()
 
+    sealed class UIEventCurrentWeather {
+        class OnLoading(var onLoading: Boolean) : UIEventCurrentWeather()
+        class OnCurrentWeatherRetrieved(var weather : LocationWeather) : UIEventCurrentWeather()
+        data class ShowErrorDialog(val resourceFailure: Resource.Failure) : UIEventCurrentWeather()
     }
+
+    sealed class UIEventForecast {
+        class OnLoading(var onLoading: Boolean) : UIEventForecast()
+        data class ShowErrorDialog(val resourceFailure: Resource.Failure) : UIEventForecast()
+        class OnCurrentForecastRetrieved(var forecast : ForecastWeather) : UIEventForecast()
+    }
+
 }

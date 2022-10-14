@@ -9,18 +9,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import com.antonyhayek.weatherbuddy.R
+import com.antonyhayek.weatherbuddy.data.local.City
+import com.antonyhayek.weatherbuddy.data.local.FavoriteCity
 import com.antonyhayek.weatherbuddy.databinding.FragmentSearchBinding
 import com.antonyhayek.weatherbuddy.presentation.base.BaseFragment
 import com.antonyhayek.weatherbuddy.presentation.ui.dashboard.DashboardViewModel
 import com.antonyhayek.weatherbuddy.utils.ImageUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding::inflate) {
+    private var favCities: List<Long> = arrayListOf()
     private lateinit var citiesAdapter: CitiesAdapter
     private var job: Job? = null
     private val viewModel: SearchViewModel by viewModels()
@@ -30,7 +37,21 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
 
         setLayoutListeners()
         setupCitiesRecyclerView()
+        retrieveFavCitiesIds()
         collectSearchData()
+    }
+
+    private fun retrieveFavCitiesIds() {
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.retrieveFavCitiesIds().collect {
+                    favCities = it
+
+                    viewModel.getCities()
+                }
+            }
+        }
     }
 
     private fun setupCitiesRecyclerView() {
@@ -45,10 +66,31 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                             city.lon.toFloat()
                         )
                     )
+            }, onFavClicked = { position, city ->
+                onFavClicked(city)
             }
         )
 
         binding.rvCities.adapter = citiesAdapter
+    }
+
+    private fun onFavClicked(city: City) {
+
+        if (city.isFavCity) {
+            viewModel.deleteCityById(city.id)
+        } else {
+            viewModel.addCityToFav(
+                FavoriteCity(
+                    id = city.id,
+                    name = city.name,
+                    lat = city.lat,
+                    lon = city.lon,
+                    country = city.country,
+                    isFavCity = true
+                )
+            )
+        }
+        retrieveFavCitiesIds()
     }
 
     private fun collectSearchData() {
@@ -64,8 +106,12 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
                         is SearchViewModel.UIEventSearch.OnCitiesRetrieved -> {
                             hideLoading()
 
-                            //TODO: populate cities.json recyclerview
-                            citiesAdapter.setCities(uiState.cities.cities_list)
+                            if (favCities.isNotEmpty())
+                                uiState.cities.forEach {
+                                    it.isFavCity = favCities.contains(it.id)
+                                }
+
+                            citiesAdapter.setCities(uiState.cities)
                         }
                         is SearchViewModel.UIEventSearch.ShowErrorDialog -> {
                             hideLoadingDialog()

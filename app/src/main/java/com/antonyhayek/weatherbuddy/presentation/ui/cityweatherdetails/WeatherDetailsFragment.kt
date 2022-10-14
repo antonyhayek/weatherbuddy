@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.antonyhayek.weatherbuddy.R
 import com.antonyhayek.weatherbuddy.databinding.FragmentWeatherDetailsBinding
@@ -28,6 +29,16 @@ class WeatherDetailsFragment : BaseFragment<FragmentWeatherDetailsBinding>(Fragm
         viewModel.getCityWeather(args.lat.toDouble(), args.lon.toDouble())
 
         collectWeatherData()
+        setLayoutListeners()
+    }
+
+    private fun setLayoutListeners() {
+
+        with(binding) {
+            ivBack.setOnClickListener {
+                findNavController().navigateUp()
+            }
+        }
     }
 
     private fun collectWeatherData() {
@@ -44,6 +55,8 @@ class WeatherDetailsFragment : BaseFragment<FragmentWeatherDetailsBinding>(Fragm
                             hideLoading()
 
                             binding.currentWeather = uiState.weather
+                            binding.tvTemperature.text =
+                                uiState.weather.main.temp.toInt().toString()
                             ImageUtils.downloadImage(
                                 requireContext(),
                                 uiState.weather.weather[0].icon,

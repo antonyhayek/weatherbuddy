@@ -2,21 +2,23 @@ package com.antonyhayek.weatherbuddy.presentation.ui.citysearch
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
-import androidx.core.os.ConfigurationCompat
+import androidx.core.content.ContextCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.antonyhayek.weatherbuddy.R
 import com.antonyhayek.weatherbuddy.data.local.City
 import com.antonyhayek.weatherbuddy.databinding.ItemCityBinding
 import kotlin.collections.ArrayList
 
 class CitiesAdapter(
     private var onCityClicked: (position: Int, city: City) -> Unit,
-
-    ) : RecyclerView.Adapter<CitiesAdapter.MySignaturesAdapterViewHolder>(), Filterable {
+    private var onFavClicked: (position: Int, city: City) -> Unit,
+    ) : RecyclerView.Adapter<CitiesAdapter.CitiesAdapterViewHolder>(), Filterable {
     private lateinit var binding: ItemCityBinding
     private lateinit var context: Context
     private var cityList: ArrayList<City> = ArrayList()
@@ -38,28 +40,29 @@ class CitiesAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): MySignaturesAdapterViewHolder {
+    ): CitiesAdapterViewHolder {
         context = parent.context
         val inflater = LayoutInflater.from(parent.context)
         binding = ItemCityBinding.inflate(inflater, parent, false)
-        return MySignaturesAdapterViewHolder(binding)
+        return CitiesAdapterViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: MySignaturesAdapterViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CitiesAdapterViewHolder, position: Int) {
         val city = tempCityList[position]
         holder.bind(city/*, isSelectionEnabled,*/, context)
 
         holder.itemView.setOnClickListener{
             onCityClicked(position, city)
         }
-       /* holder.binding.acivMask.setOnClickListener {
-            onControlClicked(position, control)
-        }*/
+
+        holder.binding.ivAddToFav.setOnClickListener {
+            onFavClicked(position, city)
+        }
     }
 
     override fun getItemCount(): Int = tempCityList.size
 
-    class MySignaturesAdapterViewHolder(val binding: ItemCityBinding) :
+    class CitiesAdapterViewHolder(val binding: ItemCityBinding) :
         RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
         fun bind(
@@ -68,6 +71,25 @@ class CitiesAdapter(
             context: Context,
         ) {
             binding.city = city
+
+            if(city.isFavCity) {
+                ImageViewCompat.setImageTintList(binding.ivAddToFav, ColorStateList.valueOf(
+                    ContextCompat.getColor(context, R.color.purple_500))
+                )
+
+            } else {
+                ImageViewCompat.setImageTintList(binding.ivAddToFav, ColorStateList.valueOf(
+                    ContextCompat.getColor(context, R.color.black))
+                )
+
+                /*binding.ivAddToFav.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_favorites
+                    )
+                )*/
+
+            }
         }
     }
 

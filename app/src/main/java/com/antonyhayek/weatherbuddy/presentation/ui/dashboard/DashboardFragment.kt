@@ -23,6 +23,8 @@ import com.antonyhayek.weatherbuddy.R
 import com.antonyhayek.weatherbuddy.data.remote.Coord
 import com.antonyhayek.weatherbuddy.databinding.FragmentDashboardBinding
 import com.antonyhayek.weatherbuddy.presentation.base.BaseFragment
+import com.antonyhayek.weatherbuddy.presentation.ui.citysearch.CitiesAdapter
+import com.antonyhayek.weatherbuddy.presentation.ui.citysearch.SearchFragmentDirections
 import com.antonyhayek.weatherbuddy.utils.ImageUtils
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -34,9 +36,11 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboardBinding::inflate) {
+    private lateinit var forecastAdapter: ForecastAdapter
     private val viewModel: DashboardViewModel by viewModels()
     private var job: Job? = null
     private lateinit var locationRequest: LocationRequest
@@ -51,8 +55,14 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboa
 
         setLayoutListeners()
         collectWeatherData()
+        setupForecastRecyclerView()
 
         requestLocationPermission()
+    }
+
+    private fun setupForecastRecyclerView() {
+        forecastAdapter = ForecastAdapter()
+        binding.rvNextDays.adapter = forecastAdapter
     }
 
     private fun requestLocationPermission() {
@@ -143,33 +153,60 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboa
 
         job = viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             lifecycleScope.launchWhenCreated {
-                viewModel.dashboardState.collect { uiState ->
-                    when (uiState) {
-                        is DashboardViewModel.UIEventDashboard.OnLoading -> {
-                            if (uiState.onLoading)
-                                showLoading()
+                launch {
+
+                    viewModel.currentWeatherState.collect { uiState ->
+                        when (uiState) {
+                            is DashboardViewModel.UIEventCurrentWeather.OnLoading -> {
+                                if (uiState.onLoading)
+                                    showLoading()
+                            }
+                            is DashboardViewModel.UIEventCurrentWeather.OnCurrentWeatherRetrieved -> {
+                                hideLoading()
+
+                                if (isAdded && isVisible) {
+                                    binding.currentWeather = uiState.weather
+                                    binding.tvTemperature.text =
+                                        uiState.weather.main.temp.toInt().toString()
+                                    ImageUtils.downloadImage(
+                                        requireContext(),
+                                        uiState.weather.weather[0].icon,
+                                        binding.ivWeatherIcon,
+                                        0
+                                    )
+
+                                    binding.lytWeatherInfo.isVisible = true
+                                }
+                            }
+                            is DashboardViewModel.UIEventCurrentWeather.ShowErrorDialog -> {
+                                hideLoadingDialog()
+
+                                showErrorDialog({ }, uiState.resourceFailure, true)
+                            }
+
                         }
-                        is DashboardViewModel.UIEventDashboard.OnCurrentWeatherRetrieved -> {
-                            hideLoading()
+                    }
+                }
+                launch {
+                    viewModel.forecastState.collect { uiState ->
+                        when (uiState) {
+                            is DashboardViewModel.UIEventForecast.OnLoading -> {
+                                if (uiState.onLoading)
+                                    showLoading()
+                            }
+                            is DashboardViewModel.UIEventForecast.ShowErrorDialog -> {
+                                hideLoadingDialog()
 
-                            if (isAdded && isVisible) {
-                                binding.currentWeather = uiState.weather
-                                ImageUtils.downloadImage(
-                                    requireContext(),
-                                    uiState.weather.weather[0].icon,
-                                    binding.ivWeatherIcon,
-                                    0
-                                )
+                                showErrorDialog({ }, uiState.resourceFailure, true)
+                            }
+                            is DashboardViewModel.UIEventForecast.OnCurrentForecastRetrieved -> {
+                                hideLoading()
 
-                                binding.lytWeatherInfo.isVisible = true
+                                if (isAdded && isVisible) {
+                                    forecastAdapter.setForecastList(uiState.forecast.list)
+                                }
                             }
                         }
-                        is DashboardViewModel.UIEventDashboard.ShowErrorDialog -> {
-                            hideLoadingDialog()
-
-                            showErrorDialog({ }, uiState.resourceFailure, true)
-                        }
-
                     }
                 }
             }
@@ -231,6 +268,7 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboa
                         if (activity != null && isAdded) {
                             viewModel.setUserCoord(Coord(location.latitude, location.longitude))
                             viewModel.getCurrentWeather()
+                            viewModel.getCurrentForecast()
                         }
                     }
 
