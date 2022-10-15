@@ -290,17 +290,9 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboa
     private fun startLocationUpdates() {
         initLocationCallback()
 
-      /*  val task: Task<LocationSettingsResponse> = settingsClient.checkLocationSettings(builder.build())
-        task.addOnSuccessListener {*/
-            fusedLocationClient.requestLocationUpdates(locationRequest,
-                locationCallback,
-                Looper.getMainLooper())
-       // }
-
-      /*  task.addOnFailureListener {
-
-            Toast.makeText(requireContext(), "Please turn on location", Toast.LENGTH_SHORT).show()
-        }*/
+        fusedLocationClient.requestLocationUpdates(locationRequest,
+            locationCallback,
+            Looper.getMainLooper())
     }
 
     private fun stopLocationUpdates() {
