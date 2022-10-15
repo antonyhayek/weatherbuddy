@@ -33,7 +33,7 @@ class WeatherDetailViewModel @Inject constructor(
                 when(it) {
                     is Resource.Failure -> {
                         _weatherDetailState.value = UIEventWeatherDetail.OnLoading(false)
-                        _weatherDetailState.value = UIEventWeatherDetail.ShowErrorDialog(it)
+                    //    _weatherDetailState.value = UIEventWeatherDetail.ShowErrorDialog(it)
                     }
                     is Resource.Loading ->  UIEventWeatherDetail.OnLoading(false)
                     is Resource.Success -> {

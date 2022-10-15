@@ -11,7 +11,7 @@ class GetCityWeatherUseCase @Inject constructor(
     private val weatherRepository: WeatherRepository
 ) {
 
-    operator fun invoke(lat: Double, lon: Double) : Flow<Resource<LocationWeather>> = flow {
-        emit(weatherRepository.cityWeatherData(lat, lon))
-    }
+    suspend operator fun invoke(lat: Double, lon: Double) : Flow<Resource<LocationWeather>> =
+        weatherRepository.cityWeatherData(lat, lon)
+
 }

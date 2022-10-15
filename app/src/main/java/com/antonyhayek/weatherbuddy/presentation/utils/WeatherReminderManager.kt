@@ -15,10 +15,10 @@ class WeatherReminderManager @Inject constructor(
     @ApplicationContext var context: Context
 ) {
 
-    val REMINDER_NOTIFICATION_REQUEST_CODE = 123
+    private val REMINDER_NOTIFICATION_REQUEST_CODE = 123
 
     fun startReminder(
-        reminderTime: String = "13:30",
+        reminderTime: String = "06:00", //every day at 6 AM
         reminderId: Int = REMINDER_NOTIFICATION_REQUEST_CODE
     ) {
 
@@ -55,12 +55,6 @@ class WeatherReminderManager @Inject constructor(
             calendar.timeInMillis,
             intent
         )
-
-     /*   alarmManager.setAlarmClock(
-            AlarmManager.AlarmClockInfo(calendar.timeInMillis, intent),
-            intent
-        )*/
-
     }
 
     fun stopReminder(

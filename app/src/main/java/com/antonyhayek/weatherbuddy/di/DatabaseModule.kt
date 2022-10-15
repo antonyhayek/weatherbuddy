@@ -32,4 +32,12 @@ object DatabaseModule {
     @Provides
     fun provideCitiesDao(db: WeatherBuddyDatabase) = db.cityDao()
 
+    @Singleton
+    @Provides
+    fun provideWeatherDao(db: WeatherBuddyDatabase) = db.weatherDao()
+
+    @Singleton
+    @Provides
+    fun provideForecastDao(db: WeatherBuddyDatabase) = db.forecastDao()
+
 }

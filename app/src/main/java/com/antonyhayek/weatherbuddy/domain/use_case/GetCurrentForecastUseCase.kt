@@ -13,7 +13,7 @@ class GetCurrentForecastUseCase @Inject constructor(
     private val weatherRepository: WeatherRepository
 ) {
 
-    operator fun invoke(coord: Coord) : Flow<Resource<ForecastWeather>> = flow {
-        emit(weatherRepository.dailyForecastData(coord.lat, coord.lon))
-    }
+    suspend operator fun invoke(coord: Coord) : Flow<Resource<ForecastWeather>> =
+        weatherRepository.dailyForecastData(coord.lat, coord.lon)
+
 }

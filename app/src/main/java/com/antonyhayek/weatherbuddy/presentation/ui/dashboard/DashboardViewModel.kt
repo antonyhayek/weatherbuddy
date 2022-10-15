@@ -8,16 +8,21 @@ import com.antonyhayek.weatherbuddy.data.remote.ForecastWeather
 import com.antonyhayek.weatherbuddy.data.remote.LocationWeather
 import com.antonyhayek.weatherbuddy.domain.use_case.GetCurrentForecastUseCase
 import com.antonyhayek.weatherbuddy.domain.use_case.GetCurrentWeatherUseCase
+import com.antonyhayek.weatherbuddy.domain.use_case.RetrieveLastUserCoordinatesUseCase
+import com.antonyhayek.weatherbuddy.domain.use_case.SetLastUserCoordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
     private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
-    private val getCurrentForecastUseCase: GetCurrentForecastUseCase
+    private val getCurrentForecastUseCase: GetCurrentForecastUseCase,
+    private val retrieveLastUserCoordinatesUseCase: RetrieveLastUserCoordinatesUseCase,
+    private val setLastUserCoordUseCase: SetLastUserCoordUseCase
 ) : ViewModel() {
     private val _currentWeatherState = MutableStateFlow<UIEventCurrentWeather>(
         UIEventCurrentWeather.OnLoading(false)
@@ -44,7 +49,7 @@ class DashboardViewModel @Inject constructor(
                 when(it) {
                     is Resource.Failure -> {
                         _currentWeatherState.value = UIEventCurrentWeather.OnLoading(false)
-                        _currentWeatherState.value = UIEventCurrentWeather.ShowErrorDialog(it)
+                    //    _currentWeatherState.value = UIEventCurrentWeather.ShowErrorDialog(it)
                     }
                     is Resource.Loading ->  UIEventCurrentWeather.OnLoading(false)
                     is Resource.Success -> {
@@ -69,7 +74,7 @@ class DashboardViewModel @Inject constructor(
                 when(it) {
                     is Resource.Failure -> {
                         _forecastState.value = UIEventForecast.OnLoading(false)
-                        _forecastState.value = UIEventForecast.ShowErrorDialog(it)
+                   //     _forecastState.value = UIEventForecast.ShowErrorDialog(it)
                     }
                     is Resource.Loading ->  UIEventForecast.OnLoading(false)
                     is Resource.Success -> {
@@ -84,6 +89,19 @@ class DashboardViewModel @Inject constructor(
 
     fun setUserCoord(coord: Coord) {
         _currentUserCoordFlow.value = coord
+        viewModelScope.launch {
+            setLastUserCoordUseCase(coord)
+        }
+
+    }
+
+    fun getLastUserCoordinates() {
+        viewModelScope.launch {
+            retrieveLastUserCoordinatesUseCase().collect{
+                _currentWeatherState.value = UIEventCurrentWeather.OnLastUserCoordRetrieved(coord = it)
+            }
+        }
+
     }
 
 
@@ -91,6 +109,7 @@ class DashboardViewModel @Inject constructor(
         class OnLoading(var onLoading: Boolean) : UIEventCurrentWeather()
         class OnCurrentWeatherRetrieved(var weather : LocationWeather) : UIEventCurrentWeather()
         data class ShowErrorDialog(val resourceFailure: Resource.Failure) : UIEventCurrentWeather()
+        class OnLastUserCoordRetrieved(var coord: Coord) : UIEventCurrentWeather()
     }
 
     sealed class UIEventForecast {

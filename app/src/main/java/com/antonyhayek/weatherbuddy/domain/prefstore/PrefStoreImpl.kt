@@ -40,8 +40,40 @@ class PrefsStoreImpl @Inject constructor(
         }
     }
 
+    override fun getLastUserLat(): Flow<Double> =
+        dataStore.data.catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { it[PreferencesKeys.LAT] ?: 0.0 }
+
+    override suspend fun setLastUserLat(lat: Double) {
+        dataStore.edit {
+            it[PreferencesKeys.LAT] = lat
+        }
+    }
+
+    override fun getLastUserLon(): Flow<Double> =
+        dataStore.data.catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { it[PreferencesKeys.LON] ?: 0.0 }
+
+    override suspend fun setLastUserLon(lon: Double) {
+        dataStore.edit {
+            it[PreferencesKeys.LON] = lon
+        }
+    }
+
     private object PreferencesKeys {
         val UNIT = stringPreferencesKey("unit")
+        val LAT = doublePreferencesKey("lat")
+        val LON = doublePreferencesKey("lon")
     }
 
 

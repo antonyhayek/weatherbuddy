@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
 
     <application
@@ -25,10 +26,6 @@
         android:theme="@style/Theme.WeatherBuddy"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
-        <service
-            android:name=".presentation.utils.WeatherNotificationService"
-            android:exported="false"/>
 
         <activity
             android:name=".MainActivity"

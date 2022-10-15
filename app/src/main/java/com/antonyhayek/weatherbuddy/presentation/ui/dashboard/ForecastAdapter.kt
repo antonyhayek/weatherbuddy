@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.antonyhayek.weatherbuddy.R
 import com.antonyhayek.weatherbuddy.data.remote.ForecastMain
 import com.antonyhayek.weatherbuddy.databinding.ItemForecastBinding
 import com.antonyhayek.weatherbuddy.utils.ImageUtils
@@ -73,7 +74,7 @@ class ForecastAdapter() : RecyclerView.Adapter<ForecastAdapter.ForecastAdapterVi
                     context,
                     forecast.weather[0].icon,
                     binding.ivWeatherIcon,
-                    0
+                    R.drawable.ic_error_default
                 )
             }
 

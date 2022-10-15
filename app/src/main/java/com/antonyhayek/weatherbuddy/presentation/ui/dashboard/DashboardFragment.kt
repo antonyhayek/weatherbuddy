@@ -112,17 +112,15 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboa
         locationRequest = LocationRequest.create()
         locationRequest.interval = 10000
         locationRequest.fastestInterval = 5000
-        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.priority = Priority.PRIORITY_HIGH_ACCURACY
 
         // Create LocationSettingsRequest object using location request
         builder = LocationSettingsRequest.Builder()
         builder.addLocationRequest(locationRequest)
+        builder.setAlwaysShow(true)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         settingsClient = LocationServices.getSettingsClient(requireContext())
-
-        val builder = LocationSettingsRequest.Builder()
-            .addLocationRequest(locationRequest)
 
         val client = LocationServices.getSettingsClient(requireActivity())
         val task = client.checkLocationSettings(builder.build())
@@ -141,6 +139,7 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboa
                         IntentSenderRequest.Builder(e.resolution).build()
 
                     requestCheckSettings.launch(intentSenderRequest)
+
 
                 } catch (sendEx: IntentSender.SendIntentException) {
                     // Ignore the error.
@@ -172,7 +171,7 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboa
                                         requireContext(),
                                         uiState.weather.weather[0].icon,
                                         binding.ivWeatherIcon,
-                                        0
+                                        R.drawable.ic_error_default
                                     )
 
                                     binding.lytWeatherInfo.isVisible = true
@@ -183,7 +182,17 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboa
 
                                 showErrorDialog({ }, uiState.resourceFailure, true)
                             }
+                            is DashboardViewModel.UIEventCurrentWeather.OnLastUserCoordRetrieved -> {
 
+                                if(uiState.coord.lat != 0.0 && uiState.coord.lon != 0.0) {
+                                    viewModel.setUserCoord(coord = uiState.coord)
+                                    viewModel.getCurrentWeather()
+                                    viewModel.getCurrentForecast()
+                                } else {
+                                    //user has no saved coordinates. oblige him to turn on Location
+                                    createLocationRequest()
+                                }
+                            }
                         }
                     }
                 }
@@ -250,7 +259,7 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboa
                     startLocationUpdates()
                 }
                 else ->{
-                    createLocationRequest()
+                    viewModel.getLastUserCoordinates()
                 }
             }
         }
@@ -281,19 +290,17 @@ class DashboardFragment : BaseFragment<FragmentDashboardBinding>(FragmentDashboa
     private fun startLocationUpdates() {
         initLocationCallback()
 
-        val task: Task<LocationSettingsResponse> = settingsClient.checkLocationSettings(builder.build())
-        task.addOnSuccessListener {
+      /*  val task: Task<LocationSettingsResponse> = settingsClient.checkLocationSettings(builder.build())
+        task.addOnSuccessListener {*/
             fusedLocationClient.requestLocationUpdates(locationRequest,
                 locationCallback,
                 Looper.getMainLooper())
-        }
+       // }
 
-        task.addOnFailureListener {
+      /*  task.addOnFailureListener {
 
             Toast.makeText(requireContext(), "Please turn on location", Toast.LENGTH_SHORT).show()
-        }
-
-
+        }*/
     }
 
     private fun stopLocationUpdates() {

@@ -21,6 +21,7 @@ import com.antonyhayek.weatherbuddy.databinding.FragmentSearchBinding
 import com.antonyhayek.weatherbuddy.presentation.base.BaseFragment
 import com.antonyhayek.weatherbuddy.presentation.ui.dashboard.DashboardViewModel
 import com.antonyhayek.weatherbuddy.utils.ImageUtils
+import com.antonyhayek.weatherbuddy.utils.NetworkUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -59,13 +60,21 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>(FragmentSearchBinding
         citiesAdapter = CitiesAdapter(
             onCityClicked = { position, city ->
 
-                if (findNavController().currentDestination!!.id == R.id.searchFragment)
-                    findNavController().navigate(
-                        SearchFragmentDirections.actionSearchFragmentToWeatherDetailsFragment(
-                            city.lat.toFloat(),
-                            city.lon.toFloat()
+                if(NetworkUtils.isInternetAvailable(requireContext())) {
+                    if (findNavController().currentDestination!!.id == R.id.searchFragment)
+                        findNavController().navigate(
+                            SearchFragmentDirections.actionSearchFragmentToWeatherDetailsFragment(
+                                city.lat.toFloat(),
+                                city.lon.toFloat()
+                            )
                         )
-                    )
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Internet connection is needed to display city weather",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }, onFavClicked = { position, city ->
                 onFavClicked(city)
             }

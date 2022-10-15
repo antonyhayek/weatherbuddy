@@ -61,7 +61,7 @@ class WeatherDetailsFragment : BaseFragment<FragmentWeatherDetailsBinding>(Fragm
                                 requireContext(),
                                 uiState.weather.weather[0].icon,
                                 binding.ivWeatherIcon,
-                                0
+                                R.drawable.ic_error_default
                             )
                         }
                         is WeatherDetailViewModel.UIEventWeatherDetail.ShowErrorDialog -> {
